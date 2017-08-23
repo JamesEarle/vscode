@@ -314,11 +314,16 @@ export class SCMViewlet extends Viewlet {
 
 		this.list = new List(this.listContainer, delegate, renderers, {
 			identityProvider,
-			keyboardSupport: false
+			keyboardSupport: true
 		});
 
 		this.disposables.push(attachListStyler(this.list, this.themeService));
 		this.disposables.push(this.listService.register(this.list));
+
+		chain(domEvent(this.listContainer, 'keydown'))
+			.map(e => new StandardKeyboardEvent(e))
+			.filter(e => e.equals(KeyMod.CtrlCmd | KeyCode.KEY_A))
+			.on(this.onSelectAll, this, this.disposables);
 
 		chain(this.list.onOpen)
 			.map(e => e.elements[0])
@@ -338,6 +343,10 @@ export class SCMViewlet extends Viewlet {
 		this.themeService.onThemeChange(this.update, this, this.disposables);
 
 		return TPromise.as(null);
+	}
+
+	private onSelectAll(): void {
+		console.log('TODO');
 	}
 
 	private onDidAcceptInput(): void {
